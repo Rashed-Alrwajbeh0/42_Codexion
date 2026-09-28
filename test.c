@@ -14,44 +14,66 @@
 #include <pthread.h>
 #include <unistd.h>
 
-typedef	struct	argv{
-	pthread_mutex_t	*mutrex;
-	int				x;	
-}	argv;
+int primes[10] = {2, 3, 5, 7, 9, 11, 13, 17, 19, 23};
 
-void	*do_something(void *Data)
-{
-	argv	*data;
-	data = Data;
-	data->x++;
-	return (NULL);
+typedef struct	data{
+	pthread_mutex_t	*mutex;
+	int				*sum;
+	int				start_idx;
+	int				end_idx;
+} data;
+
+
+void*	calc_sum(void* Data){
+	int				*sum;
+	int				start;
+	int				end;
+	data			*data_;
+	pthread_mutex_t	*m;
+
+	data_ = (data*) Data;
+	start = data_->start_idx;
+	end = data_->end_idx;
+	printf("Start: %d\n", start);
+	sum = data_->sum;
+	m = data_->mutex;
+	for (; start < end; start++){
+		pthread_mutex_lock(m);
+		*sum += primes[start];
+		printf("sum: %d\n", *sum);
+		pthread_mutex_unlock(m);
+	}
+	return NULL;
 }
 
-int	main(void)
-{
-	pthread_mutex_t		m;
-	pthread_t			Threads[4];
-	argv 				Data;
 
-	Data.mutrex = &m;
-	Data.x = 0;
+int	main(void){
+	pthread_mutex_t m;
+	pthread_t		thread1;
+	pthread_t		thread2;
+	data			Data1;
+	data			Data2;
+	int				sum;
+
 	pthread_mutex_init(&m, NULL);
-	for (int i  = 0; i < 4; i++)
-	{
-		Data.x++;
-		if (pthread_create(&Threads[i], NULL, &do_something, &Data))
-			return (1);
-		printf("Thread %d is start !\n", i);
-	}
-	sleep(2);
-	for (int i  = 0; i < 4; i++)
-	{
-		if (pthread_join(Threads[i], NULL))
-			return (1);
-		printf("Thread %d is stop !\n", i);
-	}
+	sum = 0;
+	Data1.mutex = &m;
+	Data1.sum = &sum;
+	Data1.start_idx = 0;
+	Data1.end_idx = 5;
+	Data2.mutex = &m;
+	Data2.sum = &sum;
+	Data2.start_idx = 5;
+	Data2.end_idx = 10;
+	if (pthread_create(&thread1, NULL, &calc_sum, &Data1))
+		return 1;
+	if (pthread_create(&thread2, NULL, &calc_sum, &Data2))
+		return 1;
+	printf("%d\n", sum);
+	if (pthread_join(thread1, NULL))
+		return 0;
+	if (pthread_join(thread2, NULL))
+		return 0;
+	printf("%d\n", sum);
 	pthread_mutex_destroy(&m);
-	printf("X: %d\n", Data.x);
-	return (0);
-
 }
