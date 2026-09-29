@@ -31,17 +31,26 @@ typedef struct arguments
 
 typedef struct thread_vars
 {
-	t_arguments		arguments;
-	pthread_t		thread;
+	int				id;
+	pthread_t		*thread;
 	struct timeval	last_compilation_time;
+	t_arguments		arguments;
+	pthread_mutex_t	*print_mutex;
+	pthread_mutex_t	*left_dongle;
+	pthread_mutex_t	*right_dongle;
+	struct timeval	*strart_program;
+
 }	t_thread_vars;
 
 typedef struct queue
 {
+	char			*priority_type;
 	int				size;
-	t_thread_vars	elemets[];
+	t_thread_vars	*elemets[];
 }	t_priority_queue;
+
 t_arguments	*check_arg(char *args[]);
-int	edf(t_thread_vars t1, t_thread_vars t2);
-int	fifo(t_priority_queue *q, t_thread_vars t);
+int			edf(t_thread_vars t1, t_thread_vars t2);
+int			calctime(struct timeval t);
+
 #endif
