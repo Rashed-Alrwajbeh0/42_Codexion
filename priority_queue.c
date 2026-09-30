@@ -1,14 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   priority_queue.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/30 09:24:11 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/09/30 09:24:12 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-
-char	*determaine_child(t_priority_queue *q, int q_size,
-							int left, int right)
+static char	*determaine_child(t_priority_queue *q, int q_size, int current)
 {
+	int				left;
+	int				right;
+
+	left = 2 * current + 1;
+	right = 2 * current + 2;
 	if (right < q_size && left < q_size
-		&& edf(*(q->elemets[right]), *(q->elemets[left])))
+		&& edf((q->elemets[right]), (q->elemets[left])))
 		return ("right");
 	else if (left < q_size && right < q_size
-		&& edf(*(q->elemets[left]), *(q->elemets[right])))
+		&& edf((q->elemets[left]), (q->elemets[right])))
 		return ("left");
 	else if (left < q_size && !(right < q_size))
 		return ("left");
@@ -18,49 +33,31 @@ char	*determaine_child(t_priority_queue *q, int q_size,
 }
 
 
-void	swap(t_priority_queue *q, int *current, int another_idx)
-{
-	t_thread_vars	*temp;
-
-	temp = q->elemets[*current];
-	q->elemets[*current] = q->elemets[another_idx];
-	q->elemets[another_idx] = temp;
-	*current = another_idx;
-}
-
-void sort_to_down(t_priority_queue *q, int q_size)
+static void	sort_to_down(t_priority_queue *q, int q_size)
 {
 	int				current;
-	int				left;
-	int				right;
 	char			*child;
 
 	current = 0;
-	left = 2 * current + 1;
-	right = 2 * current + 2;
-	child = determaine_child(q, q_size, left, right);
+	child = determaine_child(q, q_size, current);
 	while (child)
 	{
 		if (!strcmp(child, "right"))
 		{
-			swap(q, &current, right);
-			left = 2 * current + 1;
-			right = 2 * current + 2;
-			child = determaine_child(q, q_size, left, right);
+			swap(q, &current, 'r');
+			child = determaine_child(q, q_size, current);
 		}
 		else if (!strcmp(child, "left"))
 		{
-			swap(q, &current, left);
-			left = 2 * current + 1;
-			right = 2 * current + 2;
-			child = determaine_child(q, q_size, left, right, current);
+			swap(q, &current, 'l');
+			child = determaine_child(q, q_size, current);
 		}
 		else
 			break ;
 	}
 }
 
-void	sort_to_top(t_priority_queue *q)
+static void	sort_to_top(t_priority_queue *q)
 {
 	int				parent;
 	int				current;
@@ -72,7 +69,7 @@ void	sort_to_top(t_priority_queue *q)
 	parent = (current - 1) / 2;
 	while (1)
 	{
-		if (edf(*(q->elemets[current]), *(q->elemets[parent])))
+		if (edf((q->elemets[current]), (q->elemets[parent])))
 		{
 			temp = q->elemets[parent];
 			q->elemets[parent] = q->elemets[current];

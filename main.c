@@ -20,18 +20,44 @@ void *test(void *Data){
 	struct timeval	*current_time;
 
 	data = (t_thread_vars*) Data;
+	if (data->id % 2)
+	{
+		pthread_mutex_lock(data->right_dongle);
+		pthread_mutex_lock(data->left_dongle);
+
+	}
+	else
+	{
+		pthread_mutex_lock(data->left_dongle);
+		pthread_mutex_lock(data->right_dongle);
+	}
 	current_time = malloc(sizeof(struct timeval));
 	gettimeofday(current_time, NULL);
-	
+	usleep(200000);
+	if (data->id % 2)
+	{
+		pthread_mutex_unlock(data->left_dongle);
+		pthread_mutex_unlock(data->right_dongle);
+
+	}
+	else
+	{
+		pthread_mutex_unlock(data->right_dongle);
+		pthread_mutex_unlock(data->left_dongle);
+
+	}
+	pthread_mutex_lock(data->print_mutex);
 	printf("%d %d Test\n", calctime(*current_time) -  calctime(*(data->strart_program)),data->id);
-	return NULL;
+	pthread_mutex_unlock(data->print_mutex);
+	return (NULL);
 }
 
-void	fill(t_thread_vars **_threads, pthread_mutex_t **_mutex, t_arguments arguments)
+void	fill(t_thread_vars **_threads, t_mutex_info **_mutex, t_arguments arguments)
 {
 	int				i;
 	int				n;
-	pthread_mutex_t	*m;
+	t_mutex_info	*m;
+	pthread_mutex_t	*mm;
 	pthread_t		*th;
 	t_thread_vars	*temp;
 
@@ -39,8 +65,11 @@ void	fill(t_thread_vars **_threads, pthread_mutex_t **_mutex, t_arguments argume
 	n = arguments.number_of_coders;
 	while (++i < n)
 	{
-		m = malloc(sizeof(pthread_mutex_t));
-		pthread_mutex_init(m, NULL);
+		m = malloc(sizeof(t_mutex_info));
+		mm = malloc(sizeof(pthread_mutex_t));
+		pthread_mutex_init(mm, NULL);
+		m->mutex = mm;
+		m->activaited = 0;
 		_mutex[i] = m;
 	}
 	i = -1;
@@ -50,8 +79,8 @@ void	fill(t_thread_vars **_threads, pthread_mutex_t **_mutex, t_arguments argume
 		temp = malloc(sizeof(t_thread_vars));
 		temp->id = i + 1;
 		temp->arguments = arguments;
-		temp->right_dongle = _mutex[i % n];
-		temp->left_dongle = _mutex[(i - 1 + n) % n];
+		temp->right_dongle = _mutex[i % n]->mutex;
+		temp->left_dongle = _mutex[(i - 1 + n) % n]->mutex;
 		temp->thread = th;
 		_threads[i] = temp;
 	}
@@ -59,12 +88,13 @@ void	fill(t_thread_vars **_threads, pthread_mutex_t **_mutex, t_arguments argume
 
 int	main(int argc, char *argv[])
 {
-	char			*scheduler;
-	t_arguments		*checked_arg;
-	t_thread_vars	**_threads;
-	pthread_mutex_t	**_mutex;
-	pthread_mutex_t	*print_mutex;
-	struct timeval	*time;
+	char				*scheduler;
+	t_arguments			*checked_arg;
+	t_thread_vars		**_threads;
+	t_mutex_info		**_mutex;
+	pthread_mutex_t		*print_mutex;
+	struct timeval		*time;
+	t_priority_queue	*q;
 
 	if (argc != 9)
 	{
@@ -79,18 +109,21 @@ int	main(int argc, char *argv[])
 	else
 		return (free(checked_arg), printf("Error in the arguments !!\n"), 0);
 	_threads = malloc(sizeof(t_thread_vars*) * checked_arg->number_of_coders);
-	_mutex = malloc(sizeof(pthread_mutex_t*) * checked_arg->number_of_coders);
+	_mutex = malloc(sizeof(t_mutex_info*) * checked_arg->number_of_coders);
 	print_mutex = malloc(sizeof(pthread_mutex_t));
 	time = malloc(sizeof(struct timeval));
+	q = malloc(sizeof(t_priority_queue) + sizeof(t_thread_vars*) * checked_arg->number_of_coders);
+	q->priority_type = scheduler;
 	pthread_mutex_init(print_mutex, NULL);
 	fill(_threads, _mutex, *checked_arg);
 	gettimeofday(time, NULL);
 	for (int i = 0; i < checked_arg->number_of_coders; i++){
 		_threads[i]->print_mutex = print_mutex;
 		_threads[i]->strart_program = time;
+		_threads[i]->last_compilation_time = *time;
 		pthread_create(_threads[i]->thread, NULL, &test, _threads[i]);
+		add_to_queue(q, _threads[i]);
 	}
-
 	for (int i = 0; i < checked_arg->number_of_coders; i++){
 		pthread_join(*(_threads[i]->thread), NULL);
 	}

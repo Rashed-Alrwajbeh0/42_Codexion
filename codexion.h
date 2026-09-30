@@ -16,7 +16,8 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/time.h>
-# include <pthread.h> 
+# include <pthread.h>
+# include <unistd.h>
 
 typedef struct arguments
 {
@@ -31,26 +32,35 @@ typedef struct arguments
 
 typedef struct thread_vars
 {
-	int				id;
 	pthread_t		*thread;
-	struct timeval	last_compilation_time;
-	t_arguments		arguments;
 	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	*left_dongle;
 	pthread_mutex_t	*right_dongle;
 	struct timeval	*strart_program;
+	struct timeval	last_compilation_time;
+	t_arguments		arguments;
+	int				id;
 
 }	t_thread_vars;
 
 typedef struct queue
 {
-	char			*priority_type;
 	int				size;
+	char			*priority_type;
 	t_thread_vars	*elemets[];
 }	t_priority_queue;
 
-t_arguments	*check_arg(char *args[]);
-int			edf(t_thread_vars t1, t_thread_vars t2);
-int			calctime(struct timeval t);
+typedef struct	mutex_info
+{
+	pthread_mutex_t	*mutex;
+	int				activaited;
+}	t_mutex_info;
+
+t_arguments		*check_arg(char *args[]);
+t_thread_vars	*top_priority(t_priority_queue *q);
+int				edf(t_thread_vars *t1, t_thread_vars *t2);
+void			swap(t_priority_queue *q, int *current, char dir);
+void			add_to_queue(t_priority_queue *q, t_thread_vars *t);
+int				calctime(struct timeval t);
 
 #endif
