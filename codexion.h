@@ -39,6 +39,7 @@ typedef struct thread_vars
 	struct timeval	*strart_program;
 	struct timeval	last_compilation_time;
 	t_arguments		arguments;
+	int				finished;
 	int				id;
 
 }	t_thread_vars;

@@ -82,8 +82,56 @@ void	fill(t_thread_vars **_threads, t_mutex_info **_mutex, t_arguments arguments
 		temp->right_dongle = _mutex[i % n]->mutex;
 		temp->left_dongle = _mutex[(i - 1 + n) % n]->mutex;
 		temp->thread = th;
+		temp->finished = 0;
 		_threads[i] = temp;
 	}
+	th = malloc(sizeof(pthread_t));
+	temp = malloc(sizeof(t_thread_vars));
+	temp->id = i + 1;
+	temp->arguments = arguments;
+	temp->right_dongle = _mutex[i % n]->mutex;
+	temp->left_dongle = _mutex[(i - 1 + n) % n]->mutex;
+	temp->thread = th;
+	temp->finished = 0;
+	_threads[i] = temp;
+	i++;
+	_threads[i] = NULL;
+}
+
+void	stop_now(t_mutex_info **_mutex, t_thread_vars **_threads)
+{
+	int		i;
+
+	i = -1;
+	while (_mutex[++i])
+	{
+		free(_threads[i]->thread);
+		free(_threads[i]->strart_program);
+		free(_threads[i]->print_mutex);
+		free(_threads[i]);
+		free(_mutex[i]);
+	}
+}
+
+int	len(t_thread_vars **threads){
+	int	i;
+
+	i = -1;
+	while (threads[++i])
+		;
+	return (i);
+}
+
+void	*moniter(void *data){
+	int					con;
+	t_thread_vars		**_threads;
+
+	_threads = (t_thread_vars **)data;
+	while (1)
+	{
+		if (_threads[i].)
+	}
+	
 }
 
 int	main(int argc, char *argv[])
@@ -108,7 +156,7 @@ int	main(int argc, char *argv[])
 		scheduler = argv[8];
 	else
 		return (free(checked_arg), printf("Error in the arguments !!\n"), 0);
-	_threads = malloc(sizeof(t_thread_vars*) * checked_arg->number_of_coders);
+	_threads = malloc(sizeof(t_thread_vars*) * (checked_arg->number_of_coders + 2));
 	_mutex = malloc(sizeof(t_mutex_info*) * checked_arg->number_of_coders);
 	print_mutex = malloc(sizeof(pthread_mutex_t));
 	time = malloc(sizeof(struct timeval));
