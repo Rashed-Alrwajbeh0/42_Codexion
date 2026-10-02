@@ -33,7 +33,7 @@ t_arguments	*check_arg(char *args[])
 
 	resault = malloc(sizeof(t_arguments));
 	if (!resault)
-		return (0);
+		return (NULL);
 	if (check_ints(1, 8, args))
 	{
 		resault->number_of_coders = atoi(args[1]);

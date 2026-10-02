@@ -15,10 +15,19 @@
 
 int	edf(t_thread_vars *t1, t_thread_vars *t2)
 {
-	if (calctime(t1->last_compilation_time) + t1->arguments.time_to_burnout
-		<= calctime(t2->last_compilation_time) + t2->arguments.time_to_burnout)
+	if (t1->finish_first_compilation && t2->finish_first_compilation)
+	{
+		if (calctime(t1->last_compilation_time) + t1->arguments.time_to_burnout
+			< calctime(t2->last_compilation_time) + t2->arguments.time_to_burnout)
+			return (1);
+		return (0);
+	}
+	else if (!t1->finish_first_compilation && t2->finish_first_compilation)
 		return (1);
-	return (0);
+	else if (t1->finish_first_compilation && !t2->finish_first_compilation)
+		return (0);
+	else
+		return (t1->id < t2->id);
 }
 
 int	calctime(struct timeval t)

@@ -177,3 +177,24 @@ int	main(int argc, char *argv[])
 	}
 	return (free(checked_arg), 0);
 }
+
+int	main(int argc, char *argv[]){
+	t_arguments			*checked_arg;
+	char				*scheduler;
+	t_mutex_info		**dongles;
+
+	if (argc != 9)
+		return (printf("Enter just 8 arguments, no more no less !!\n"), 0);
+	checked_arg = check_arg(argv);
+	if (!checked_arg)
+		return (0);
+		if (!strcmp("fifo", argv[8]) || !strcmp("edf", argv[8]))
+		scheduler = argv[8];
+	else
+		return (free(checked_arg), printf("Error in the arguments !!\n"), 0);
+	dongles = dongles_init(checked_arg->number_of_coders);
+	if (!dongles)
+		return (free(checked_arg), free(scheduler), 0);
+	
+
+}

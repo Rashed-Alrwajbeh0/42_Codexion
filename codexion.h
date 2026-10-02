@@ -32,15 +32,16 @@ typedef struct arguments
 
 typedef struct thread_vars
 {
+	int				*burn_out;
 	pthread_t		*thread;
 	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	*left_dongle;
 	pthread_mutex_t	*right_dongle;
-	struct timeval	*strart_program;
 	struct timeval	last_compilation_time;
 	t_arguments		arguments;
 	int				finished;
 	int				id;
+	int				finish_first_compilation;
 
 }	t_thread_vars;
 
@@ -54,14 +55,24 @@ typedef struct queue
 typedef struct	mutex_info
 {
 	pthread_mutex_t	*mutex;
+	struct timeval	last_use;
 	int				activaited;
+	int				in_use;
 }	t_mutex_info;
 
 t_arguments		*check_arg(char *args[]);
 t_thread_vars	*top_priority(t_priority_queue *q);
 int				edf(t_thread_vars *t1, t_thread_vars *t2);
 void			swap(t_priority_queue *q, int *current, char dir);
+void			free_all_dongels(t_mutex_info	**dongles, int n);
+void			free_all_coders(t_thread_vars	**coders, int n);
 void			add_to_queue(t_priority_queue *q, t_thread_vars *t);
 int				calctime(struct timeval t);
-
+t_mutex_info	**dongles_init(int number_of_dongels);
+t_thread_vars	**coders_init(t_arguments argumetns,
+								t_mutex_info **dongels,
+								int *burn_out,
+								pthread_mutex_t *print,
+								struct timeval *start_program
+							);
 #endif
