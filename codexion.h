@@ -37,6 +37,8 @@ typedef struct thread_vars
 	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	*left_dongle;
 	pthread_mutex_t	*right_dongle;
+	pthread_mutex_t	*queue_control;
+	pthread_cond_t	*cond;
 	struct timeval	last_compilation_time;
 	t_arguments		arguments;
 	int				finished;
@@ -60,19 +62,27 @@ typedef struct	mutex_info
 	int				in_use;
 }	t_mutex_info;
 
-t_arguments		*check_arg(char *args[]);
-t_thread_vars	*top_priority(t_priority_queue *q);
-int				edf(t_thread_vars *t1, t_thread_vars *t2);
-void			swap(t_priority_queue *q, int *current, char dir);
-void			free_all_dongels(t_mutex_info	**dongles, int n);
-void			free_all_coders(t_thread_vars	**coders, int n);
-void			add_to_queue(t_priority_queue *q, t_thread_vars *t);
-int				calctime(struct timeval t);
-t_mutex_info	**dongles_init(int number_of_dongels);
-t_thread_vars	**coders_init(t_arguments argumetns,
-								t_mutex_info **dongels,
-								int *burn_out,
-								pthread_mutex_t *print,
-								struct timeval *start_program
-							);
+typedef struct compose
+{
+	t_thread_vars		*top_priority_in_the_queue;
+	t_thread_vars		*thread;
+	t_priority_queue	*queue;
+}	t_compose;
+
+t_arguments			*check_arg(char *args[]);
+t_thread_vars		*top_priority(t_priority_queue *q);
+int					edf(t_thread_vars *t1, t_thread_vars *t2);
+void				swap(t_priority_queue *q, int *current, char dir);
+void				free_all_dongels(t_mutex_info	**dongles, int n);
+void				free_all_coders(t_thread_vars	**coders, int n);
+void				add_to_queue(t_priority_queue *q, t_thread_vars *t);
+void				free_queue(t_priority_queue *my_queue);
+int					calctime(struct timeval t);
+t_mutex_info		**dongles_init(int number_of_dongels);
+t_thread_vars		**coders_init(t_arguments argumetns,
+						t_mutex_info **dongels,
+						int *burn_out,
+						pthread_mutex_t *print);
+t_priority_queue	*queue_init(t_thread_vars **threads, char *scheduler);
+
 #endif

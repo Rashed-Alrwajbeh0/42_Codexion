@@ -37,18 +37,30 @@ t_mutex_info	**dongles_init(int number_of_dongels)
 t_thread_vars	**coders_init(t_arguments argumetns,
 								t_mutex_info **dongels,
 								int *burn_out,
-								pthread_mutex_t *print,
-								struct timeval *start_program
-							)
+								pthread_mutex_t *print)
 {
 	t_thread_vars	**coders;
 	t_thread_vars	*one_coder;
 	pthread_t		*th;
+	pthread_mutex_t	*m;
+	pthread_cond_t	*cond;
 	int				i;
 	int				n;
 
+	m = malloc(sizeof(pthread_mutex_t));
+	if (!m)
+		return (NULL);
+	if (pthread_mutex_init(m, NULL))
+		return (free(m), NULL);
+	cond = malloc(sizeof(pthread_cond_t));
+	if (!cond)
+		return (free(m), NULL);
+	if (pthread_cond_init(cond, NULL))
+		return (free(cond), free(m), NULL);
 	n = argumetns.number_of_coders;
 	coders = malloc(sizeof(t_thread_vars*) * n + sizeof(void*));
+	if (!coders)
+		return (free(cond), free(m), NULL);
 	i = 0;
 	while (i < n)
 	{
@@ -67,6 +79,8 @@ t_thread_vars	**coders_init(t_arguments argumetns,
 		one_coder->finish_first_compilation = 0;
 		one_coder->left_dongle = dongels[(i - 1 + n) % n]->mutex;
 		one_coder->right_dongle = dongels[i % n]->mutex;
+		one_coder->queue_control = m;
+		one_coder->cond = cond;
 		coders[i] = one_coder;
 		i++;
 	}
@@ -76,5 +90,18 @@ t_thread_vars	**coders_init(t_arguments argumetns,
 
 t_priority_queue	*queue_init(t_thread_vars **threads, char *scheduler)
 {
+	t_priority_queue	*my_queue;
+	int					i;
 
+	my_queue = malloc(sizeof(t_priority_queue)
+			+ sizeof(t_thread_vars *)
+			* (threads[0]->arguments.number_of_coders));
+	if (!my_queue)
+		return (NULL);
+	i = -1;
+	my_queue->size = 0;
+	my_queue->priority_type = scheduler;
+	while (threads[++i])
+		add_to_queue(my_queue, threads[i]);
+	return (my_queue);
 }
