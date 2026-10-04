@@ -30,13 +30,21 @@ typedef struct arguments
 	int		dongle_cooldown;
 }	t_arguments;
 
+typedef struct	mutex_info
+{
+	pthread_mutex_t	*mutex;
+	struct timeval	last_use;
+	int				activaited;
+	int				in_use;
+}	t_mutex_info;
+
 typedef struct thread_vars
 {
 	int				*burn_out;
 	pthread_t		*thread;
 	pthread_mutex_t	*print_mutex;
-	pthread_mutex_t	*left_dongle;
-	pthread_mutex_t	*right_dongle;
+	t_mutex_info	*left_dongle;
+	t_mutex_info	*right_dongle;
 	pthread_mutex_t	*queue_control;
 	pthread_cond_t	*cond;
 	struct timeval	last_compilation_time;
@@ -54,23 +62,17 @@ typedef struct queue
 	t_thread_vars	*elemets[];
 }	t_priority_queue;
 
-typedef struct	mutex_info
-{
-	pthread_mutex_t	*mutex;
-	struct timeval	last_use;
-	int				activaited;
-	int				in_use;
-}	t_mutex_info;
-
 typedef struct compose
 {
 	t_thread_vars		*top_priority_in_the_queue;
 	t_thread_vars		*thread;
 	t_priority_queue	*queue;
+	struct timeval		*start_time;
 }	t_compose;
 
 t_arguments			*check_arg(char *args[]);
 t_thread_vars		*top_priority(t_priority_queue *q);
+t_thread_vars		*get_top_priority(t_priority_queue *q);
 int					edf(t_thread_vars *t1, t_thread_vars *t2);
 void				swap(t_priority_queue *q, int *current, char dir);
 void				free_all_dongels(t_mutex_info	**dongles, int n);

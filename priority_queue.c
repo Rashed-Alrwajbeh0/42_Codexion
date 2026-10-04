@@ -111,3 +111,10 @@ t_thread_vars	*top_priority(t_priority_queue *q)
 		answer = NULL;
 	return (answer);
 }
+
+t_thread_vars	*get_top_priority(t_priority_queue *q)
+{
+	if (q->size)
+		return (q->elemets[0]);
+	return (NULL);
+}

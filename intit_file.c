@@ -77,8 +77,8 @@ t_thread_vars	**coders_init(t_arguments argumetns,
 		one_coder->finished = 0;
 		one_coder->print_mutex = print;
 		one_coder->finish_first_compilation = 0;
-		one_coder->left_dongle = dongels[(i - 1 + n) % n]->mutex;
-		one_coder->right_dongle = dongels[i % n]->mutex;
+		one_coder->left_dongle = dongels[(i - 1 + n) % n];
+		one_coder->right_dongle = dongels[i % n];
 		one_coder->queue_control = m;
 		one_coder->cond = cond;
 		coders[i] = one_coder;
@@ -102,6 +102,8 @@ t_priority_queue	*queue_init(t_thread_vars **threads, char *scheduler)
 	my_queue->size = 0;
 	my_queue->priority_type = scheduler;
 	while (threads[++i])
+	{
 		add_to_queue(my_queue, threads[i]);
+	}
 	return (my_queue);
 }
