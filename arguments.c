@@ -20,17 +20,24 @@ int	check_ints(int start, int end, char *args[])
 	while (start < end)
 	{
 		temp = atoi(args[start]);
-		if (!temp || temp <= 0)
+		if (!strcmp(args[start], "0") && start != 0)
+		{
+			start++;
+			continue;
+		}
+		if (!temp || temp < 0)
 			return (0);
 		start++;
 	}
 	return (1);
 }
 
-t_arguments	*check_arg(char *args[])
+t_arguments	*check_arg(char *args[], int argc)
 {
 	t_arguments	*resault;
 
+	if (argc != 9)
+		return (printf("Enter just 8 arguments, no more no less !!\n"), NULL);
 	resault = malloc(sizeof(t_arguments));
 	if (!resault)
 		return (NULL);

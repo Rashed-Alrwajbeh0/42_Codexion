@@ -23,7 +23,7 @@ t_mutex_info	**dongles_init(int number_of_dongels)
 		if (pthread_mutex_init(m, NULL))
 			return (free(m), free(one_dongle),
 			free_all_dongels(dongles, i), NULL);
-		one_dongle->activaited = 1;
+		one_dongle->activaited = 0;
 		one_dongle->in_use = 0;
 		dongles[i] = one_dongle;
 		i++;
@@ -105,5 +105,6 @@ t_priority_queue	*queue_init(t_thread_vars **threads, char *scheduler)
 	{
 		add_to_queue(my_queue, threads[i]);
 	}
+	my_queue->burnout_thread = NULL;
 	return (my_queue);
 }

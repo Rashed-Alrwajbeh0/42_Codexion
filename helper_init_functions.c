@@ -44,6 +44,7 @@ void	free_queue(t_priority_queue *my_queue)
 			free(my_queue->elemets[i]);
 			i++;
 		}
+		free(my_queue->burnout_thread);
 		free(my_queue);
 	}
 }

@@ -57,8 +57,9 @@ typedef struct thread_vars
 
 typedef struct queue
 {
-	int				size;
 	char			*priority_type;
+	t_thread_vars	*burnout_thread;
+	int				size;
 	t_thread_vars	*elemets[];
 }	t_priority_queue;
 
@@ -68,6 +69,8 @@ typedef struct compose
 	t_thread_vars		*thread;
 	t_priority_queue	*queue;
 	struct timeval		*start_time;
+	int					*finished_threads;
+	int					*finished_for_now;
 }	t_compose;
 
 t_arguments			*check_arg(char *args[]);

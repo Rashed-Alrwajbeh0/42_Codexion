@@ -20,14 +20,18 @@ static char	*determaine_child(t_priority_queue *q, int q_size, int current)
 	left = 2 * current + 1;
 	right = 2 * current + 2;
 	if (right < q_size && left < q_size
-		&& edf((q->elemets[right]), (q->elemets[left])))
+		&& edf((q->elemets[right]), (q->elemets[left]))
+		&& edf((q->elemets[right]), (q->elemets[current])))
 		return ("right");
 	else if (left < q_size && right < q_size
-		&& edf((q->elemets[left]), (q->elemets[right])))
+		&& edf((q->elemets[left]), (q->elemets[right]))
+		&& edf((q->elemets[left]), (q->elemets[current])))
 		return ("left");
-	else if (left < q_size && !(right < q_size))
+	else if (left < q_size && !(right < q_size)
+		&& edf((q->elemets[left]), (q->elemets[current])))
 		return ("left");
-	else if (right < q_size && !(left < q_size))
+	else if (right < q_size && !(left < q_size)
+		&& edf((q->elemets[right]), (q->elemets[current])))
 		return ("right");
 	return (NULL);
 }
