@@ -35,6 +35,7 @@ int	check_ints(int start, int end, char *args[])
 t_arguments	*check_arg(char *args[], int argc)
 {
 	t_arguments	*resault;
+	char		*scheduler;
 
 	if (argc != 9)
 		return (printf("Enter just 8 arguments, no more no less !!\n"), NULL);
@@ -50,6 +51,10 @@ t_arguments	*check_arg(char *args[], int argc)
 		resault->time_to_refactor = atoi(args[5]);
 		resault->number_of_compiles_required = atoi(args[6]);
 		resault->dongle_cooldown = atoi(args[7]);
+		if (!strcmp("fifo", args[8]) || !strcmp("edf", args[8]))
+			resault->scheduler = args[8];
+		else
+			return (free(resault), printf("Error in the arguments!\n"), NULL);
 		return (resault);
 	}
 	else

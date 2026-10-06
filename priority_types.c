@@ -13,43 +13,46 @@
 #include "codexion.h"
 
 
-int	edf(t_thread_vars *t1, t_thread_vars *t2)
+int	edf(t_coder *t1, t_coder *t2, t_common_vars common)
 {
-	if (t1->finish_first_compilation && t2->finish_first_compilation)
+	if (t1->last_compilation_time != -1 && t2->last_compilation_time != -1)
 	{
-		if (calctime(t1->last_compilation_time) + t1->arguments.time_to_burnout
-			< calctime(t2->last_compilation_time) + t2->arguments.time_to_burnout)
+		if (t1->last_compilation_time + common.args.time_to_burnout
+			< t2->last_compilation_time + common.args.time_to_burnout)
 			return (1);
-		if (calctime(t1->last_compilation_time) + t1->arguments.time_to_burnout
-			> calctime(t2->last_compilation_time) + t2->arguments.time_to_burnout)
-			return (0);
-		return (t1->id < t2->id);
-		// return (0);
-	}
-	else if (!t1->finish_first_compilation && t2->finish_first_compilation)
-		return (1);
-	else if (t1->finish_first_compilation && !t2->finish_first_compilation)
+		if (t1->last_compilation_time + common.args.time_to_burnout
+			> t2->last_compilation_time + common.args.time_to_burnout)
+			return(-1);
 		return (0);
+	}
+	else if (t1->last_compilation_time != -1)
+		return (-1);
+	else if (t2->last_compilation_time != -1)
+		return (1);
 	else
-		return (t1->id < t2->id);
+	{
+		if (t1->id < t2->id)
+			return (1);
+		return (-1);
+	}
 }
 
-int	calctime(struct timeval t)
-{
-	return ((1000 * t.tv_sec) + (t.tv_usec / 1000));
-}
+//int	calctime(struct timeval t)
+//{
+//	return ((1000 * t.tv_sec) + (t.tv_usec / 1000));
+//}
 
-void	swap(t_priority_queue *q, int *current, char dir)
+void	swap(t_queue *q, int *current, char dir)
 {
-	t_thread_vars	*temp;
+	t_coder	*temp;
 	int				another_idx;
 
 	if (dir == 'r')
 		another_idx = 2 * *current + 2;
 	else
 		another_idx = 2 * *current + 1;
-	temp = q->elemets[*current];
-	q->elemets[*current] = q->elemets[another_idx];
-	q->elemets[another_idx] = temp;
+	temp = q->coders[*current];
+	q->coders[*current] = q->coders[another_idx];
+	q->coders[another_idx] = temp;
 	*current = another_idx;
 }
