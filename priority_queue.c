@@ -92,7 +92,7 @@ static void	sort_to_top(t_queue *q, t_common_vars common)
 void	add_to_queue(t_queue *q, t_coder *t, t_common_vars common)
 {
 	q->size++;
-	printf("%d\n", q->size);
+	//printf("%d\n", q->size);
 	q->coders[q->size - 1] = t;
 	if (!strcmp(common.args.scheduler, "edf"))
 		sort_to_top(q, common);

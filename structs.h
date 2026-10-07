@@ -23,7 +23,7 @@ typedef struct arguments
 typedef struct dongle
 {
 	pthread_mutex_t	*dongle;
-	struct timeval	*last_use;
+	long			last_use;
 	int				is_in_use;
 }	t_dongle;
 
@@ -32,13 +32,14 @@ typedef struct coder
 	int				*burn_out;
 	pthread_t		*thread;
 	pthread_mutex_t	*print_mutex;
-	t_dongle		left_dongle;
-	t_dongle		right_dongle;
+	t_dongle		*left_dongle;
+	t_dongle		*right_dongle;
 	pthread_mutex_t	*queue_control;
 	pthread_cond_t	*cond;
 	long	last_compilation_time;
 	long			program_start_time;
 	int				id;
+	int				is_ready;
 }	t_coder;
 
 typedef struct priority_queue
