@@ -44,7 +44,7 @@ int	edf(t_coder *t1, t_coder *t2, t_common_vars common)
 
 void	swap(t_queue *q, int *current, char dir)
 {
-	t_coder	*temp;
+	t_coder			*temp;
 	int				another_idx;
 
 	if (dir == 'r')

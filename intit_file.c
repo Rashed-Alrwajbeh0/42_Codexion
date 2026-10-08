@@ -126,7 +126,7 @@ t_coder	**intit_coders(t_common_vars *commn)
 	i = -1;
 	while (++i < commn->args.number_of_coders)
 	{
-		temp_coder = help_with_intit_coders(i, commn, calctime(*now));
+		temp_coder = help_with_intit_coders(i + 1, commn, calctime(*now));
 		if (!temp_coder)
 			return (free_all_coders(coders, i), free(now), NULL);
 		coders[i] = temp_coder;
@@ -134,12 +134,26 @@ t_coder	**intit_coders(t_common_vars *commn)
 	return (coders);
 }
 
+int	check_burnout(t_threads_args *my_args)
+{
+	struct timeval *current_time;
 
+	current_time = malloc(sizeof(current_time));
+	if (!current_time)
+		return (1);
+	gettimeofday(current_time, NULL);
+	if (my_args->coders[my_args->coder_idx]->last_compilation_time != -1
+		&& calctime(*current_time)
+		- my_args->coders[my_args->coder_idx]->last_compilation_time
+		>= my_args->common->args.time_to_burnout)
+		return (free(current_time), 1);
+	return (free(current_time), 0);
+}
 
 int	compiling(t_threads_args *my_args, int last_compile)
 {
 	struct timeval *current_time;
-	t_coder	*coder;
+	t_coder			*coder;
 
 	current_time = malloc(sizeof(struct timeval));
 	if (!current_time)
@@ -147,15 +161,25 @@ int	compiling(t_threads_args *my_args, int last_compile)
 	coder = my_args->coders[my_args->coder_idx];
 	pthread_mutex_lock(coder->right_dongle->dongle);
 	pthread_mutex_lock(coder->left_dongle->dongle);
-	if (my_args->burnout_coder)
+	if (check_burnout(my_args))
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (*my_args->burnout_coder)
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (!print(coder, "has taken a dongle"))
+		return (free(current_time), 0);
+	if (check_burnout(my_args))
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (*my_args->burnout_coder)
 		return (free(current_time), 0);
 	if (!print(coder, "has taken a dongle"))
 		return (free(current_time), 0);
-	if (my_args->burnout_coder)
-		return (free(current_time), 0);
-	if (!print(coder, "has taken a dongle"))
-		return (free(current_time), 0);
-	if (my_args->burnout_coder)
+	if (check_burnout(my_args))
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (*my_args->burnout_coder)
 		return (free(current_time), 0);
 	if (!print(coder, "is compiling"))
 		return (free(current_time), 0);
@@ -171,17 +195,23 @@ int	compiling(t_threads_args *my_args, int last_compile)
 	coder->right_dongle->is_in_use = 0;
 	coder->left_dongle->is_in_use = 0;
 	pthread_mutex_unlock(my_args->common->queue_controler);
-	if (my_args->burnout_coder)
+	if (check_burnout(my_args))
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (*my_args->burnout_coder)
 		return (free(current_time), 0);
 	if (!print(coder, "is debugging"))
 		return (free(current_time), 0);
 	usleep(my_args->common->args.time_to_debug * 1000);
-	if (my_args->burnout_coder)
+	if (check_burnout(my_args))
+		return (*coder->burn_out = 1, *my_args->burnout_coder = coder,
+			free(current_time), 0);
+	if (*my_args->burnout_coder)
 		return (free(current_time), 0);
 	if (!print(coder, "is refactoring"))
 		return (free(current_time), 0);
 	usleep(my_args->common->args.time_to_refactor * 1000);
-	if (!last_compile)
+	if (!last_compile && !(*my_args->burnout_coder))
 	{
 		pthread_mutex_lock(my_args->common->queue_controler);
 		add_to_queue(my_args->common->my_queue, coder, *my_args->common);
@@ -201,14 +231,18 @@ void	*coder_work(void* Data)
 	my_args = (t_threads_args *)Data;
 	//printf("", my_args-)
 	while(++i < my_args->common->args.number_of_compiles_required
-		&& !my_args->burnout_coder)
+		&& !(*my_args->burnout_coder))
 	{
 		//printf("%d\n", i);
 		temp = my_args->common->queue_controler;
 		temp_coder = my_args->coders[my_args->coder_idx];
 		pthread_mutex_lock(temp);
 		while (!temp_coder->is_ready)
+		{
 			pthread_cond_wait(temp_coder->cond, temp);
+			// if ((*my_args->burnout_coder))
+			// 	return (NULL);
+		}
 		temp_coder->is_ready = 0;
 		pthread_mutex_unlock(temp);
 		if (i + 1 == my_args->common->args.number_of_compiles_required)
@@ -227,6 +261,7 @@ void	*monitor_function(void *Data)
 	t_threads_args	*threads_args;
 	struct timeval	*current_time;
 	int				j;
+	int 			cheack;
 	t_coder			*temp_coder;
 	t_coder			**temp_coders;
 
@@ -243,10 +278,23 @@ void	*monitor_function(void *Data)
 	
 	while (*threads_args->finished_coders < threads_args->common->args.number_of_coders)
 	{
-		//usleep(100000);
 		j = -1;
 		while (threads_args->common->my_queue->size)
 		{
+			if (*threads_args->burnout_coder)
+			{
+				j = -1;
+				while (++j < threads_args->common->args.number_of_coders)
+				{
+					pthread_mutex_lock(threads_args->common->queue_controler);
+					threads_args->coders[j]->is_ready = 1;
+					pthread_mutex_unlock(threads_args->common->queue_controler);
+					pthread_cond_signal(threads_args->coders[j]->cond);
+				}
+				
+				print(*threads_args->burnout_coder, "burned out");
+				return (NULL);
+			}
 			pthread_mutex_lock(threads_args->common->queue_controler);
 			temp_coder = top_priority(threads_args->common->my_queue, *threads_args->common);
 			pthread_mutex_unlock(threads_args->common->queue_controler);
@@ -266,6 +314,8 @@ void	*monitor_function(void *Data)
 			}
 			else
 				temp_coders[++j] = temp_coder;
+			// usleep(10000);
+			// printf_queu(threads_args->common->my_queue);
 		}
 		temp_coders[++j] = NULL;
 		j = -1;
@@ -282,7 +332,7 @@ void	*monitor_function(void *Data)
 int start_coders(t_coder **coders, t_common_vars *commn)
 {
 	t_threads_args	*threads_args;
-	t_coder			*bournout_coder;
+	t_coder			**bournout_coder;
 	pthread_t		*monitor;
 	int				*finished_coders;
 	int				idx;
@@ -290,13 +340,13 @@ int start_coders(t_coder **coders, t_common_vars *commn)
 	monitor = malloc(sizeof(pthread_t));
 	if (!monitor)
 		return (0);
-			bournout_coder = malloc(sizeof(t_coder));
+			bournout_coder = malloc(sizeof(t_coder *));
 	if (!bournout_coder)
 		return (free(monitor), 0);
 	finished_coders = malloc(sizeof(int));
 	if (!finished_coders)
 		return (free(monitor), free(bournout_coder), 0);
-	bournout_coder = NULL;
+	*bournout_coder = NULL;
 	*finished_coders = 0;
 	idx = -1;
 	while (++idx < commn->args.number_of_coders)	
@@ -317,7 +367,7 @@ int start_coders(t_coder **coders, t_common_vars *commn)
 	
 	if (!threads_args)
 		return (free(monitor), free(bournout_coder), free(finished_coders), 0);
-			threads_args->burnout_coder = bournout_coder;
+	threads_args->burnout_coder = bournout_coder;
 	threads_args->coders = coders;
 	threads_args->common = commn;
 	threads_args->coder_idx = idx;
@@ -347,6 +397,7 @@ int	make_threads(t_arguments args, t_dongle *dongles, t_queue *my_queue)
 	i = -1;
 	while (++i < common->args.number_of_coders)
 		add_to_queue(my_queue, coders[i], *common);
+	// printf_queu(my_queue);
 	start_coders(coders, common);
 		
 }

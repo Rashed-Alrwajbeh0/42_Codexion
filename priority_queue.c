@@ -21,18 +21,18 @@ static char	*determaine_child(t_queue *q, int q_size, int current,
 	left = 2 * current + 1;
 	right = 2 * current + 2;
 	if (right < q_size && left < q_size
-		&& edf((q->coders[right]), (q->coders[left]), common)
-		&& edf((q->coders[right]), (q->coders[current]), common))
+		&& edf((q->coders[right]), (q->coders[left]), common) == 1
+		&& edf((q->coders[right]), (q->coders[current]), common) == 1)
 		return ("right");
 	else if (left < q_size && right < q_size
-		&& edf((q->coders[left]), (q->coders[right]), common)
-		&& edf((q->coders[left]), (q->coders[current]), common))
+		&& edf((q->coders[left]), (q->coders[right]), common) == -1
+		&& edf((q->coders[left]), (q->coders[current]), common) == 1)
 		return ("left");
 	else if (left < q_size && !(right < q_size)
-		&& edf((q->coders[left]), (q->coders[current]), common))
+		&& edf((q->coders[left]), (q->coders[current]), common) == 1)
 		return ("left");
 	else if (right < q_size && !(left < q_size)
-		&& edf((q->coders[right]), (q->coders[current]), common))
+		&& edf((q->coders[right]), (q->coders[current]), common) == 1)
 		return ("right");
 	return (NULL);
 }
@@ -101,19 +101,47 @@ void	add_to_queue(t_queue *q, t_coder *t, t_common_vars common)
 t_coder	*top_priority(t_queue *q, t_common_vars common)
 {
 	t_coder	*answer;
+	int		i;
 
 	if (q->size)
 	{
-		answer = q->coders[0];
-		q->size--;
-		if (!q->size)
-			return (answer);
-		q->coders[0] = q->coders[q->size];
-		q->coders[q->size] = NULL;
+
 		if (!strcmp(common.args.scheduler, "edf"))
+		{
+			answer = q->coders[0];
+			q->size--;
+			if (!q->size)
+				return (answer);
+			q->coders[0] = q->coders[q->size];
+			q->coders[q->size] = NULL;
+			// if (!strcmp(common.args.scheduler, "edf"))
 			sort_to_down(q, q->size, common);
+		}
+		else if (!strcmp(common.args.scheduler, "fifo"))
+		{
+			answer = q->coders[0];
+			q->size--;
+			if (!q->size)
+				return (q->coders[i] = NULL, answer);
+			i = -1;
+			while (++i < q->size)
+				q->coders[i] = q->coders[i + 1];
+			q->coders[q->size] = NULL;
+		}
 	}
 	else
 		answer = NULL;
 	return (answer);
+}
+
+void printf_queu(t_queue *q)
+{
+	int	i = -1;
+	if (!q->size)
+		return ;
+	printf("--->");
+	while(q->coders[++i])
+		printf("%d--->", q->coders[i]->id);
+	printf("\n");
+	
 }

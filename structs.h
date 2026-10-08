@@ -46,6 +46,7 @@ typedef struct priority_queue
 {
 	t_coder	**coders;
 	int		size;
+	int		start;
 }	t_queue;
 
 typedef struct common_vars
@@ -63,7 +64,7 @@ typedef struct common_vars
 typedef struct threads_arguments
 {
 	t_coder			**coders;
-	t_coder			*burnout_coder;
+	t_coder			**burnout_coder;
 	t_common_vars	*common;
 	int				*finished_coders;
 	int				coder_idx;

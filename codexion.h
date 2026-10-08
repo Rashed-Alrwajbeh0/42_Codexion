@@ -30,5 +30,5 @@ void	free_common_variables(t_common_vars *common);
 int	print(t_coder *coder, char *txt);
 int	is_available(t_coder *coder, long current_time, t_common_vars *common);
 int	put_cond_variables(t_coder **coders, t_common_vars *commom);
-
+void	printf_queu(t_queue *q);
 #endif

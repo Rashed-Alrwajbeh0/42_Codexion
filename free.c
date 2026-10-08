@@ -30,7 +30,7 @@ int	print(t_coder *coder, char *txt)
 	printf("%d %d %s\n",
 		calctime(*current_time)
 		- coder->program_start_time,
-		coder->id + 1,
+		coder->id,
 		txt
 	);
 	free(current_time);
