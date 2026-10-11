@@ -27,8 +27,10 @@ int	edf(t_coder *t1, t_coder *t2, t_common_vars common);
 void	swap(t_queue *q, int *current, char dir);
 void	free_all_cond(t_coder **coders, int end);
 void	free_common_variables(t_common_vars *common);
-int	print(t_coder *coder, char *txt);
-int	is_available(t_coder *coder, long current_time, t_common_vars *common);
-int	put_cond_variables(t_coder **coders, t_common_vars *commom);
+void	print(t_coder *coder, char *txt);
+int		is_available(t_coder *coder, t_common_vars common);
+int		put_cond_variables(t_coder **coders, t_common_vars *commom);
 void	printf_queu(t_queue *q);
+int	add_to_queue_front(t_queue *q, int n, t_coder **c, t_common_vars common);
+void	burned_out_print(t_coder *coder, char *txt);
 #endif

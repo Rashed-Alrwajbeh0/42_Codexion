@@ -19,38 +19,58 @@ void	free_common_variables(t_common_vars *common)
 	free(common);
 }
 
-int	print(t_coder *coder, char *txt)
+void	print(t_coder *coder, char *txt)
 {
-	struct timeval *current_time;
+	struct timeval current_time;
 
-	current_time = malloc(sizeof(struct timeval));
-	if (!current_time)
-		return (0);
-	gettimeofday(current_time, NULL);
+	if (*coder->burn_out)
+		return ;
+	gettimeofday(&current_time, NULL);
+	pthread_mutex_lock(coder->print_mutex);
 	printf("%d %d %s\n",
-		calctime(*current_time)
+		calctime(current_time)
 		- coder->program_start_time,
 		coder->id,
 		txt
 	);
-	free(current_time);
-	return (1);
+	pthread_mutex_unlock(coder->print_mutex);
 }
 
-int	is_available(t_coder *coder, long current_time, t_common_vars *common)
+void	burned_out_print(t_coder *coder, char *txt)
 {
+	struct timeval current_time;
+
+	gettimeofday(&current_time, NULL);
+	pthread_mutex_lock(coder->print_mutex);
+	printf("%d %d %s\n",
+		calctime(current_time)
+		- coder->program_start_time,
+		coder->id,
+		txt
+	);
+	pthread_mutex_unlock(coder->print_mutex);
+}
+
+int	is_available(t_coder *coder, t_common_vars common)
+{
+	struct timeval	time;
+	long			current_time;
+
+	gettimeofday(&time, NULL);
+	current_time = calctime(time);
 	if (!coder->left_dongle->is_in_use && !coder->right_dongle->is_in_use)
 	{
 		if (!coder->right_dongle->last_use && !coder->left_dongle->last_use)
 			return (1);
 		else if (!coder->right_dongle->last_use && coder->left_dongle->last_use
-			&& current_time - coder->left_dongle->last_use >= common->args.dongle_cooldown)
+			&& current_time - coder->left_dongle->last_use >= common.args.dongle_cooldown)
 			return (1);
 		else if (!coder->left_dongle->last_use && coder->right_dongle->last_use
-			&& current_time - coder->right_dongle->last_use >= common->args.dongle_cooldown)
+			&& current_time - coder->right_dongle->last_use >= common.args.dongle_cooldown)
 			return (1);
-		else if (current_time - coder->right_dongle->last_use >= common->args.dongle_cooldown 
-		&& current_time - coder->left_dongle->last_use >= common->args.dongle_cooldown)
+		else if (coder->right_dongle->last_use && coder->left_dongle->last_use 
+			&& current_time - coder->right_dongle->last_use >= common.args.dongle_cooldown 
+			&& current_time - coder->left_dongle->last_use >= common.args.dongle_cooldown)
 			return(1);
 		return (0);
 	}

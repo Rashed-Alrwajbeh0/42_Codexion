@@ -1,1 +1,1 @@
-valgrind: ./codexion: No such file or directory
+./tester.sh: line 202: valgrind: command not found

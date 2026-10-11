@@ -37,11 +37,6 @@ int	edf(t_coder *t1, t_coder *t2, t_common_vars common)
 	}
 }
 
-//int	calctime(struct timeval t)
-//{
-//	return ((1000 * t.tv_sec) + (t.tv_usec / 1000));
-//}
-
 void	swap(t_queue *q, int *current, char dir)
 {
 	t_coder			*temp;
@@ -56,3 +51,4 @@ void	swap(t_queue *q, int *current, char dir)
 	q->coders[another_idx] = temp;
 	*current = another_idx;
 }
+

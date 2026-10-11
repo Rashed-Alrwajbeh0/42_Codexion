@@ -25,7 +25,7 @@ static char	*determaine_child(t_queue *q, int q_size, int current,
 		&& edf((q->coders[right]), (q->coders[current]), common) == 1)
 		return ("right");
 	else if (left < q_size && right < q_size
-		&& edf((q->coders[left]), (q->coders[right]), common) == -1
+		&& edf((q->coders[left]), (q->coders[right]), common) != -1
 		&& edf((q->coders[left]), (q->coders[current]), common) == 1)
 		return ("left");
 	else if (left < q_size && !(right < q_size)
@@ -74,7 +74,7 @@ static void	sort_to_top(t_queue *q, t_common_vars common)
 	parent = (current - 1) / 2;
 	while (1)
 	{
-		if (edf((q->coders[current]), (q->coders[parent]), common))
+		if (edf((q->coders[current]), (q->coders[parent]), common) == 1)
 		{
 			temp = q->coders[parent];
 			q->coders[parent] = q->coders[current];
@@ -94,8 +94,37 @@ void	add_to_queue(t_queue *q, t_coder *t, t_common_vars common)
 	q->size++;
 	//printf("%d\n", q->size);
 	q->coders[q->size - 1] = t;
-	if (!strcmp(common.args.scheduler, "edf"))
+	if (!strcmp(common.args.scheduler, "edf") && q->size != 1)
 		sort_to_top(q, common);
+}
+
+int	add_to_queue_front(t_queue *my_queue, int n, t_coder **coders, t_common_vars common)
+{
+	int			idx;
+	int			j;
+	t_coder		**new_coders;
+
+	if (!strcmp(common.args.scheduler, "edf"))
+	{
+		j = -1;
+		while (++j < n)
+			add_to_queue(my_queue, coders[j], common);
+		return (1);
+	}
+	new_coders = malloc(common.args.number_of_coders * sizeof(t_coder *));
+	if (!new_coders)
+		return (0);
+	idx = 0;
+	j = -1;
+	while (++j < n)
+		new_coders[idx++] = coders[j];
+	j = -1;
+	while (++j < my_queue->size)
+		new_coders[idx++] = my_queue->coders[j];
+	free(my_queue->coders);
+	my_queue->coders = new_coders;
+	my_queue->size += n;
+	return (1);
 }
 
 t_coder	*top_priority(t_queue *q, t_common_vars common)
@@ -122,7 +151,7 @@ t_coder	*top_priority(t_queue *q, t_common_vars common)
 			answer = q->coders[0];
 			q->size--;
 			if (!q->size)
-				return (q->coders[i] = NULL, answer);
+				return (q->coders[0] = NULL, answer);
 			i = -1;
 			while (++i < q->size)
 				q->coders[i] = q->coders[i + 1];

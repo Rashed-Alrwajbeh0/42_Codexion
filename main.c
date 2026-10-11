@@ -10,6 +10,8 @@ int	main(int argc, char *argv[])
 	args = check_arg(argv, argc);
 	if (!args)
 		return (0);
+	if (args->number_of_coders == 1)
+		return(printf("0 1 burned out\n"), 0);
 	dongles = init_dongles(*args);
 	if (!dongles)
 		return (free(args), 0);
