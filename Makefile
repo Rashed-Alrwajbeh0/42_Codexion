@@ -1,11 +1,28 @@
-flages = -Wall -Wextra -Werror -pthread
+NAME = codexion
 
-all:
-	@cc $(flages) test.c
-	@./a.out
-clean:
-<<<<<<< HEAD
-	rm -rf vgcore.*
-=======
-	@rm -rf vgcore.*
->>>>>>> 07b1d98 (finish)
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -pthread
+
+C_FILES = init_coders.c \
+			priority_types.c \
+			arguments.c \
+			init_common.c \
+			make_threads.c \
+			start_threads.c \
+			coder_work.c \
+			free.c \
+			init_dongles.c \
+			monitor.c \
+			priority_queue.c \
+			main.c \
+			helper_init_functions.c
+
+all : $(NAME)
+$(NAME) : $(O_FILES) codexion.h structs.h
+	$(CC) $(CFLAGS) $(C_FILES) -o $(NAME)
+clean :
+	rm -f *.o
+fclean : clean
+	rm -f  $(NAME)
+re : fclean all
+.PHONY : clean fclean all re

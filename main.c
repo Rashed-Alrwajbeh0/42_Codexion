@@ -11,13 +11,25 @@ int	main(int argc, char *argv[])
 	if (!args)
 		return (0);
 	if (args->number_of_coders == 1)
-		return(printf("0 1 burned out\n"), 0);
+	{
+		printf("0 1 has taken a dongle\n");
+		usleep(args->time_to_burnout * 1000);
+		printf("%d 1 burned out\n", args->time_to_burnout);
+		return(free(args), 0);
+	}
 	dongles = init_dongles(*args);
 	if (!dongles)
 		return (free(args), 0);
 	my_queue = init_queue(*args);
 	if (!my_queue)
-		return (free(args), free(dongles), 0);
-	if (!make_threads(*args, dongles, my_queue))
-		return (free(args), free(dongles), free(my_queue), 0);
+		return (
+		free_all_dongels(dongles, args->number_of_coders),
+		free(args),
+		0);
+	make_threads(*args, dongles, my_queue);
+   	free_all_dongels(dongles, args->number_of_coders);
+   	free(my_queue->coders);
+   	free(my_queue);
+   	free(args);
+   	return (0);
 }

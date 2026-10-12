@@ -15,8 +15,27 @@ void	free_common_variables(t_common_vars *common)
 	free(common->print);
 	free(common->stop);
 	free(common->queue_controler);
-	free_all_dongels(common->dongles, common->args.number_of_coders);
 	free(common);
+}
+
+void	free_after_finish(t_coder **coders, t_common_vars common)
+{
+	int	i;
+	int	n_coders;
+
+	i = -1;
+	n_coders = common.args.number_of_coders;
+	while (++i < n_coders)
+	{
+		if (coders[i]->is_start)
+		{
+			pthread_mutex_lock(common.queue_controler);
+			coders[i]->is_ready = 1;
+			pthread_mutex_unlock(common.queue_controler);
+			pthread_cond_signal(coders[i]->cond);
+		}
+	}
+	
 }
 
 void	print(t_coder *coder, char *txt)
@@ -27,7 +46,7 @@ void	print(t_coder *coder, char *txt)
 		return ;
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(coder->print_mutex);
-	printf("%d %d %s\n",
+	printf("%ld %d %s\n",
 		calctime(current_time)
 		- coder->program_start_time,
 		coder->id,
@@ -42,7 +61,7 @@ void	burned_out_print(t_coder *coder, char *txt)
 
 	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(coder->print_mutex);
-	printf("%d %d %s\n",
+	printf("%ld %d %s\n",
 		calctime(current_time)
 		- coder->program_start_time,
 		coder->id,

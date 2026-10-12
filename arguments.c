@@ -20,11 +20,6 @@ int	check_ints(int start, int end, char *args[])
 	while (start < end)
 	{
 		temp = atoi(args[start]);
-		if (!strcmp(args[start], "0") && start != 0)
-		{
-			start++;
-			continue;
-		}
 		if (!temp || temp < 0)
 			return (0);
 		start++;
@@ -35,7 +30,6 @@ int	check_ints(int start, int end, char *args[])
 t_arguments	*check_arg(char *args[], int argc)
 {
 	t_arguments	*resault;
-	char		*scheduler;
 
 	if (argc != 9)
 		return (printf("Enter just 8 arguments, no more no less !!\n"), NULL);
@@ -44,7 +38,8 @@ t_arguments	*check_arg(char *args[], int argc)
 		return (NULL);
 	if (check_ints(1, 8, args))
 	{
-		resault->number_of_coders = atoi(args[1]);
+		// if (strcmp(args[1], "0"))
+			resault->number_of_coders = atoi(args[1]);
 		resault->time_to_burnout = atoi(args[2]);
 		resault->time_to_compile = atoi(args[3]);
 		resault->time_to_debug = atoi(args[4]);

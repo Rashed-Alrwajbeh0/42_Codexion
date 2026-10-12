@@ -36,10 +36,11 @@ typedef struct coder
 	t_dongle		*right_dongle;
 	pthread_mutex_t	*queue_control;
 	pthread_cond_t	*cond;
-	long	last_compilation_time;
+	long			last_compilation_time;
 	long			program_start_time;
 	int				id;
 	int				is_ready;
+	int				is_start;
 }	t_coder;
 
 typedef struct priority_queue
