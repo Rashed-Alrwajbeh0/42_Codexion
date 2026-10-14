@@ -29,7 +29,7 @@ int	make_threads(t_arguments args, t_dongle *dongles, t_queue *my_queue)
 		return (free_all_coders(coders, args.number_of_coders),
 			free_common_variables(common), 0);
 	fill_queue(common, coders);
-	ret = start_coders(coders, common);
+	ret = start_coders(coders, common);		
 	free_all_cond(coders, args.number_of_coders);
 	free_all_coders(coders, args.number_of_coders);
 	free_common_variables(common);

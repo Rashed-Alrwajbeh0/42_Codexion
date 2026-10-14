@@ -18,7 +18,7 @@ C_FILES = init_coders.c \
 			helper_init_functions.c
 
 all : $(NAME)
-$(NAME) : $(O_FILES) codexion.h structs.h
+$(NAME) : codexion.h structs.h
 	$(CC) $(CFLAGS) $(C_FILES) -o $(NAME)
 clean :
 	rm -f *.o

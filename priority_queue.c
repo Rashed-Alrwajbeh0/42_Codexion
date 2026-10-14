@@ -48,7 +48,7 @@ static void	sort_to_down(t_queue *q, int q_size, t_common_vars common)
 	while (child)
 	{
 		if (!strcmp(child, "right"))
-		{
+		{      
 			swap(q, &current, 'r');
 			child = determaine_child(q, q_size, current, common);
 		}

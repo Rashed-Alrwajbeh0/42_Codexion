@@ -6,12 +6,17 @@ void	free_all_cond(t_coder **coders, int end)
 
 	start = -1;
 	while (++start < end)
+	{
+		pthread_cond_destroy(coders[start]->cond);
 		free(coders[start]->cond);
+	}
 	
 }
 
 void	free_common_variables(t_common_vars *common)
 {
+	pthread_mutex_destroy(common->print);
+	pthread_mutex_destroy(common->queue_controler);
 	free(common->print);
 	free(common->stop);
 	free(common->queue_controler);

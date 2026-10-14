@@ -51,16 +51,21 @@ int	start_coders(t_coder **coders, t_common_vars *common)
 					0);
 		if (pthread_create(coders[idx]->thread, NULL, &coder_work, args))
 				return (
+					free(args),
 					free(shared.burnout_coder),
 					free(shared.finished_coders),
 					0);
 	}
 	args = new_args(&shared, -1);
 	if (!args)
-		return (0);
+		return (
+			free(shared.burnout_coder),
+			free(shared.finished_coders),
+			0);
 	idx = -1;
 	if (pthread_create(&monitor, NULL, &monitor_function, args))
 		return (
+				free(args),
 				free(shared.burnout_coder),
 				free(shared.finished_coders),
 				0);
