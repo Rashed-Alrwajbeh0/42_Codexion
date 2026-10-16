@@ -12,15 +12,73 @@
 
 #include "codexion.h"
 
+int	check_signal(char *text)
+{
+	int	i;
+	int	ans;
 
+	i = -1;
+	ans = 0;
+	while (text[++i])
+	{
+		if (text[i] == '-' || text[i] == '+')
+			ans++;
+		if (ans > 1)
+			return (0);
+	}
+	return (1);
+}
+
+int	check_degits(char *text)
+{
+	int	i;
+	int	temp;
+
+	i = -1;
+	while (text[++i])
+	{
+		temp = (int) text[i];
+		if (!(temp >= 48 && temp <= 57))
+		{
+			if (temp != 45 && temp != 43)
+				return (0);
+		}
+	}
+	return (1);
+}
+int	check_zero(char *text)
+{
+	int	i;
+	int	temp;
+
+	if (!check_degits(text) || !check_signal(text))
+			return (0);
+	i = -1;
+	while (text[++i])
+	{
+		temp = (int) text[i];
+		if (temp != 48 && temp != 45 && temp != 43)
+			return (0);
+	}
+	return (1);
+}
 int	check_ints(int start, int end, char *args[])
 {
 	int	temp;
 
 	while (start < end)
 	{
+		if (!check_degits(args[start]) || !check_signal(args[start]))
+			return (0);
+		if (!start)
+		{
+			if (check_zero(args[start]))
+				continue;
+			else
+				return (0);
+		}
 		temp = atoi(args[start]);
-		if (!temp || temp < 0)
+		if (temp < 0)
 			return (0);
 		start++;
 	}
