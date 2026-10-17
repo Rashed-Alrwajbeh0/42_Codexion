@@ -24,6 +24,7 @@ void	*coder_work(void *data)
 	pthread_mutex_lock(args->common->queue_controler);
 	(*args->finished_coders)++;
 	coder->is_start = 0;
+	coder->last_compilation_time = -1;
 	pthread_mutex_unlock(args->common->queue_controler);
 	return (free(args), NULL);
 }

@@ -21,7 +21,7 @@ C_FILES = init_coders.c \
 			help_with_coder_work.c
 
 all : $(NAME)
-$(NAME) : codexion.h structs.h
+$(NAME) : $(C_FILES)
 	$(CC) $(CFLAGS) $(C_FILES) -o $(NAME)
 clean :
 	rm -f  $(NAME)
