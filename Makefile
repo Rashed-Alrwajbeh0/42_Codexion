@@ -15,14 +15,16 @@ C_FILES = init_coders.c \
 			monitor.c \
 			priority_queue.c \
 			main.c \
-			helper_init_functions.c
+			helper_init_functions.c \
+			queu_functions.c \
+			free_2.c \
+			help_with_coder_work.c
 
 all : $(NAME)
 $(NAME) : codexion.h structs.h
 	$(CC) $(CFLAGS) $(C_FILES) -o $(NAME)
 clean :
-	rm -f *.o
-fclean : clean
 	rm -f  $(NAME)
+fclean : clean
 re : fclean all
 .PHONY : clean fclean all re

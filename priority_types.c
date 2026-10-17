@@ -12,7 +12,6 @@
 
 #include "codexion.h"
 
-
 int	edf(t_coder *t1, t_coder *t2, t_common_vars common)
 {
 	if (t1->last_compilation_time != -1 && t2->last_compilation_time != -1)
@@ -22,7 +21,7 @@ int	edf(t_coder *t1, t_coder *t2, t_common_vars common)
 			return (1);
 		if (t1->last_compilation_time + common.args.time_to_burnout
 			> t2->last_compilation_time + common.args.time_to_burnout)
-			return(-1);
+			return (-1);
 		return (0);
 	}
 	else if (t1->last_compilation_time != -1)
@@ -51,4 +50,3 @@ void	swap(t_queue *q, int *current, char dir)
 	q->coders[another_idx] = temp;
 	*current = another_idx;
 }
-

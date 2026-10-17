@@ -42,6 +42,12 @@ void			free_all_dongels(t_dongle *dongles, int n);
 void			free_all_coders(t_coder **coders, int n);
 void			free_all_cond(t_coder **coders, int end);
 void			free_common_variables(t_common_vars *common);
-void	free_after_finish(t_coder **coders, t_common_vars common);
+void			free_after_finish(t_coder **coders,
+					t_common_vars common);
+char			*determaine_child(t_queue *q, int q_size, int current,
+					t_common_vars common);
+void			sort_to_down(t_queue *q, int q_size, t_common_vars common);
+void			sort_to_top(t_queue *q, t_common_vars common);
+int				help_coder_work(t_threads_args *args, t_coder *coder);
 
 #endif

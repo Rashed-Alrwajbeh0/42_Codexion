@@ -46,13 +46,14 @@ int	check_degits(char *text)
 	}
 	return (1);
 }
+
 int	check_zero(char *text)
 {
 	int	i;
 	int	temp;
 
 	if (!check_degits(text) || !check_signal(text))
-			return (0);
+		return (0);
 	i = -1;
 	while (text[++i])
 	{
@@ -62,6 +63,7 @@ int	check_zero(char *text)
 	}
 	return (1);
 }
+
 int	check_ints(int start, int end, char *args[])
 {
 	int	temp;
@@ -73,7 +75,7 @@ int	check_ints(int start, int end, char *args[])
 		if (!start)
 		{
 			if (check_zero(args[start]))
-				continue;
+				continue ;
 			else
 				return (0);
 		}
@@ -96,8 +98,7 @@ t_arguments	*check_arg(char *args[], int argc)
 		return (NULL);
 	if (check_ints(1, 8, args))
 	{
-		// if (strcmp(args[1], "0"))
-			resault->number_of_coders = atoi(args[1]);
+		resault->number_of_coders = atoi(args[1]);
 		resault->time_to_burnout = atoi(args[2]);
 		resault->time_to_compile = atoi(args[3]);
 		resault->time_to_debug = atoi(args[4]);

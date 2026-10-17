@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   start_threads.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/17 10:11:40 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/10/17 10:11:41 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static int	init_shared_data(t_threads_args *shared, t_coder **coders,
@@ -31,49 +43,71 @@ static t_threads_args	*new_args(t_threads_args *shared, int idx)
 	return (args);
 }
 
-int	start_coders(t_coder **coders, t_common_vars *common)
+static int	help_with_start(t_coder **coders,
+		t_common_vars *common,
+		t_threads_args	shared
+	)
 {
-	t_threads_args	shared;
-	t_threads_args	*args;
-	pthread_t		monitor;
 	int				idx;
+	t_threads_args	*args;
 
-	if (!init_shared_data(&shared, coders, common))
-		return (0);
 	idx = -1;
 	while (++idx < common->args.number_of_coders)
 	{
 		args = new_args(&shared, idx);
 		if (!args)
 			return (
-					free(shared.burnout_coder),
-					free(shared.finished_coders),
-					0);
+				free(shared.burnout_coder),
+				free(shared.finished_coders),
+				0);
 		if (pthread_create(coders[idx]->thread, NULL, &coder_work, args))
-				return (
-					free(args),
-					free(shared.burnout_coder),
-					free(shared.finished_coders),
-					0);
+			return (
+				free(args),
+				free(shared.burnout_coder),
+				free(shared.finished_coders),
+				0);
 	}
+	return (1);
+}
+
+static int	help_with_start_monitor(t_threads_args	shared,
+			pthread_t *monitor)
+{
+	t_threads_args	*args;
+
 	args = new_args(&shared, -1);
 	if (!args)
 		return (
 			free(shared.burnout_coder),
 			free(shared.finished_coders),
 			0);
-	idx = -1;
-	if (pthread_create(&monitor, NULL, &monitor_function, args))
+	if (pthread_create(monitor, NULL, &monitor_function, args))
 		return (
-				free(args),
-				free(shared.burnout_coder),
-				free(shared.finished_coders),
-				0);
+			free(args),
+			free(shared.burnout_coder),
+			free(shared.finished_coders),
+			0);
+	return (1);
+}
+
+int	start_coders(t_coder **coders, t_common_vars *common)
+{
+	t_threads_args	shared;
+	pthread_t		monitor;
+	int				idx;
+
+	if (!init_shared_data(&shared, coders, common))
+		return (0);
+	if (!help_with_start(coders, common, shared))
+		return (0);
+	if (!help_with_start_monitor(shared, &monitor))
+		return (0);
+	idx = -1;
 	while (++idx < common->args.number_of_coders)
 		pthread_join(*(coders[idx]->thread), NULL);
 	pthread_join(monitor, NULL);
 	return (
-			free(shared.burnout_coder),
-			free(shared.finished_coders),
-			1);
+		free(shared.burnout_coder),
+		free(shared.finished_coders),
+		1);
 }

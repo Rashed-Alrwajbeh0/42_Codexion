@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/17 09:55:55 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/10/17 09:55:56 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static int	check_burnout(t_threads_args *args)
@@ -60,7 +72,6 @@ static int	serve_queue(t_threads_args *args, t_coder **skipped)
 	}
 	return (k);
 }
-
 
 static int	check_finish_coders(t_threads_args *args)
 {

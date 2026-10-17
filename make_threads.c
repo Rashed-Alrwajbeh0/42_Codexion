@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   make_threads.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/17 10:06:17 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/10/17 10:06:18 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static void	fill_queue(t_common_vars *common, t_coder **coders)
@@ -29,10 +41,9 @@ int	make_threads(t_arguments args, t_dongle *dongles, t_queue *my_queue)
 		return (free_all_coders(coders, args.number_of_coders),
 			free_common_variables(common), 0);
 	fill_queue(common, coders);
-	ret = start_coders(coders, common);		
+	ret = start_coders(coders, common);
 	free_all_cond(coders, args.number_of_coders);
 	free_all_coders(coders, args.number_of_coders);
 	free_common_variables(common);
 	return (ret);
-
 }

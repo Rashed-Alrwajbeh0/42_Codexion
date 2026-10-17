@@ -1,5 +1,17 @@
-#ifndef STRUCTS
-# define STRUCTS
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   structs.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/17 09:46:05 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/10/17 09:46:13 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef STRUCTS_H
+# define STRUCTS_H
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -60,7 +72,6 @@ typedef struct common_vars
 	t_queue			*my_queue;
 	t_dongle		*mutexes;
 }	t_common_vars;
-
 
 typedef struct threads_arguments
 {

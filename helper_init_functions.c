@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helper_init_functions.c                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ralrawaj <ralrawaj@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/10/17 09:43:55 by ralrawaj          #+#    #+#             */
+/*   Updated: 2026/10/17 09:43:57 by ralrawaj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 void	free_all_coders(t_coder	**coders, int n)
@@ -13,7 +25,6 @@ void	free_all_coders(t_coder	**coders, int n)
 	free(coders);
 }
 
-
 void	free_all_dongels(t_dongle *dongles, int n)
 {
 	int	i;
@@ -23,26 +34,3 @@ void	free_all_dongels(t_dongle *dongles, int n)
 		free(dongles[i].dongle);
 	free(dongles);
 }
-
-//void	free_queue(t_priority_queue *my_queue)
-//{
-//	int				i;
-
-//	i = 0;
-//	if (!my_queue->size)
-//		free(my_queue);
-//	else
-//	{
-//		free(my_queue->elemets[0]->cond);
-//		free(my_queue->elemets[0]->queue_control);
-//		while (i < my_queue->size)
-//		{
-//			free(my_queue->elemets[i]->thread);
-//			free(my_queue->elemets[i]);
-//			i++;
-//		}
-//		free(my_queue->burnout_thread);
-//		free(my_queue);
-//	}
-//}
-

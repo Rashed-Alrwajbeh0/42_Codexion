@@ -12,7 +12,7 @@
 
 #include "codexion.h"
 
-static char	*determaine_child(t_queue *q, int q_size, int current,
+char	*determaine_child(t_queue *q, int q_size, int current,
 			t_common_vars common)
 {
 	int				left;
@@ -37,8 +37,7 @@ static char	*determaine_child(t_queue *q, int q_size, int current,
 	return (NULL);
 }
 
-
-static void	sort_to_down(t_queue *q, int q_size, t_common_vars common)
+void	sort_to_down(t_queue *q, int q_size, t_common_vars common)
 {
 	int				current;
 	char			*child;
@@ -48,7 +47,7 @@ static void	sort_to_down(t_queue *q, int q_size, t_common_vars common)
 	while (child)
 	{
 		if (!strcmp(child, "right"))
-		{      
+		{
 			swap(q, &current, 'r');
 			child = determaine_child(q, q_size, current, common);
 		}
@@ -62,11 +61,11 @@ static void	sort_to_down(t_queue *q, int q_size, t_common_vars common)
 	}
 }
 
-static void	sort_to_top(t_queue *q, t_common_vars common)
+void	sort_to_top(t_queue *q, t_common_vars common)
 {
 	int				parent;
 	int				current;
-	t_coder	*temp;
+	t_coder			*temp;
 
 	current = q->size - 1;
 	if (!current)
@@ -87,90 +86,4 @@ static void	sort_to_top(t_queue *q, t_common_vars common)
 		if (!current)
 			break ;
 	}
-}
-
-void	add_to_queue(t_queue *q, t_coder *t, t_common_vars common)
-{
-	q->size++;
-	//printf("%d\n", q->size);
-	q->coders[q->size - 1] = t;
-	if (!strcmp(common.args.scheduler, "edf") && q->size != 1)
-		sort_to_top(q, common);
-}
-
-int	add_to_queue_front(t_queue *my_queue, int n, t_coder **coders, t_common_vars common)
-{
-	int			idx;
-	int			j;
-	t_coder		**new_coders;
-
-	if (!strcmp(common.args.scheduler, "edf"))
-	{
-		j = -1;
-		while (++j < n)
-			add_to_queue(my_queue, coders[j], common);
-		return (1);
-	}
-	new_coders = malloc(common.args.number_of_coders * sizeof(t_coder *));
-	if (!new_coders)
-		return (0);
-	idx = 0;
-	j = -1;
-	while (++j < n)
-		new_coders[idx++] = coders[j];
-	j = -1;
-	while (++j < my_queue->size)
-		new_coders[idx++] = my_queue->coders[j];
-	free(my_queue->coders);
-	my_queue->coders = new_coders;
-	my_queue->size += n;
-	return (1);
-}
-
-t_coder	*top_priority(t_queue *q, t_common_vars common)
-{
-	t_coder	*answer;
-	int		i;
-
-	if (q->size)
-	{
-
-		if (!strcmp(common.args.scheduler, "edf"))
-		{
-			answer = q->coders[0];
-			q->size--;
-			if (!q->size)
-				return (answer);
-			q->coders[0] = q->coders[q->size];
-			q->coders[q->size] = NULL;
-			// if (!strcmp(common.args.scheduler, "edf"))
-			sort_to_down(q, q->size, common);
-		}
-		else if (!strcmp(common.args.scheduler, "fifo"))
-		{
-			answer = q->coders[0];
-			q->size--;
-			if (!q->size)
-				return (q->coders[0] = NULL, answer);
-			i = -1;
-			while (++i < q->size)
-				q->coders[i] = q->coders[i + 1];
-			q->coders[q->size] = NULL;
-		}
-	}
-	else
-		answer = NULL;
-	return (answer);
-}
-
-void printf_queu(t_queue *q)
-{
-	int	i = -1;
-	if (!q->size)
-		return ;
-	printf("--->");
-	while(q->coders[++i])
-		printf("%d--->", q->coders[i]->id);
-	printf("\n");
-	
 }
