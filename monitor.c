@@ -105,7 +105,7 @@ void	*monitor_function(void *data)
 		pthread_mutex_lock(args->common->queue_controler);
 		add_to_queue_front(args->common->my_queue, k, skipped, *args->common);
 		pthread_mutex_unlock(args->common->queue_controler);
-		usleep(1);
+		usleep(100);
 	}
 	return (free(skipped), free(args), NULL);
 }

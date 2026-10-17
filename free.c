@@ -18,8 +18,8 @@ void	print(t_coder *coder, char *txt)
 
 	if (*coder->burn_out)
 		return ;
-	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(coder->print_mutex);
+	gettimeofday(&current_time, NULL);
 	printf("%ld %d %s\n",
 		calctime(current_time)
 		- coder->program_start_time,
@@ -33,8 +33,8 @@ void	burned_out_print(t_coder *coder, char *txt)
 {
 	struct timeval	current_time;
 
-	gettimeofday(&current_time, NULL);
 	pthread_mutex_lock(coder->print_mutex);
+	gettimeofday(&current_time, NULL);
 	printf("%ld %d %s\n",
 		calctime(current_time)
 		- coder->program_start_time,
